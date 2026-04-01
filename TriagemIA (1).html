@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TriagemIA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#06080f;
+  --bg2:#0d1018;
+  --surface:#111520;
+  --surface2:#171c2d;
+  --border:#1e2540;
+  --border2:#252d4a;
+  --text:#dde3f5;
+  --text2:#8892b0;
+  --text3:#4a5374;
+  --accent:#4f8ef7;
+  --accent2:#3a6fd8;
+  --accent-glow:rgba(79,142,247,.18);
+  --green:#10d48e;
+  --green-bg:rgba(16,212,142,.08);
+  --yellow:#f5c542;
+  --yellow-bg:rgba(245,197,66,.08);
+  --red:#f05252;
+  --red-bg:rgba(240,82,82,.08);
+  --r:10px;
+  --r2:16px;
+  --font:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+}
+
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:320px 1fr;
+  grid-template-rows:100vh;
+}
+
+/* ─── SIDEBAR ─────────────────────────────────── */
+.sidebar{
+  background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+.sidebar-top{
+  padding:28px 24px 20px;
+  border-bottom:1px solid var(--border);
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.logo-icon{
+  width:36px;height:36px;
+  background:var(--accent);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+  flex-shrink:0;
+}
+
+.logo-text{
+  font-size:20px;
+  font-weight:600;
+  letter-spacing:-.03em;
+}
+
+.logo-text span{color:var(--accent)}
+
+.version-pill{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:20px;
+  padding:3px 10px;
+  font-size:11px;
+  color:var(--text2);
+  font-family:var(--mono);
+}
+
+.dot-live{
+  width:6px;height:6px;
+  border-radius:50%;
+  background:var(--green);
+  animation:blink 2s ease-in-out infinite;
+}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.sidebar-section{
+  padding:16px 24px;
+  border-bottom:1px solid var(--border);
+}
+
+.section-label{
+  font-size:10px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--text3);
+  margin-bottom:10px;
+}
+
+.field-group{margin-bottom:12px}
+
+label{
+  display:block;
+  font-size:11px;
+  color:var(--text2);
+  margin-bottom:5px;
+  font-weight:500;
+}
+
+input[type=text],select,textarea{
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--border2);
+  border-radius:var(--r);
+  color:var(--text);
+  font-family:var(--font);
+  font-size:12px;
+  padding:8px 11px;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+
+input[type=text]:focus,select:focus,textarea:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-glow);
+}
+
+textarea{
+  resize:vertical;
+  min-height:150px;
+  line-height:1.55;
+  font-size:11.5px;
+}
+
+select option{background:var(--surface)}
+
+.api-warn{
+  font-size:10px;
+  color:var(--text3);
+  margin-top:4px;
+  display:flex;align-items:center;gap:4px;
+}
+
+.sidebar-footer{
+  padding:16px 24px;
+  margin-top:auto;
+}
+
+.stat-row{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+}
+
+.stat{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:10px 8px;
+  text-align:center;
+}
+
+.stat-num{
+  font-size:20px;
+  font-weight:600;
+  font-family:var(--mono);
+  line-height:1;
+}
+
+.stat-lbl{
+  font-size:9px;
+  color:var(--text3);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  margin-top:3px;
+}
+
+.stat.green .stat-num{color:var(--green)}
+.stat.yellow .stat-num{color:var(--yellow)}
+.stat.red .stat-num{color:var(--red)}
+
+/* ─── MAIN AREA ───────────────────────────────── */
+.main{
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+.topbar{
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;
+  height:56px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-shrink:0;
+}
+
+.topbar-title{
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:-.01em;
+}
+
+.topbar-sub{
+  font-size:12px;
+  color:var(--text3);
+}
+
+.topbar-right{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.model-badge{
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:6px;
+  padding:3px 9px;
+  font-size:11px;
+  font-family:var(--mono);
+  color:var(--text2);
+}
+
+.btn-clear{
+  background:transparent;
+  border:1px solid var(--border2);
+  border-radius:var(--r);
+  color:var(--text2);
+  font-size:12px;
+  font-family:var(--font);
+  padding:5px 12px;
+  cursor:pointer;
+  transition:all .2s;
+}
+.btn-clear:hover{border-color:var(--border);color:var(--text);background:var(--surface)}
+
+/* ─── MESSAGES ────────────────────────────────── */
+.messages{
+  flex:1;
+  overflow-y:auto;
+  padding:28px 28px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  scroll-behavior:smooth;
+}
+
+.messages::-webkit-scrollbar{width:4px}
+.messages::-webkit-scrollbar-track{background:transparent}
+.messages::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+.msg-wrap{
+  display:flex;
+  gap:10px;
+  animation:fadeup .25s ease;
+}
+@keyframes fadeup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.msg-wrap.user{flex-direction:row-reverse}
+
+.avatar{
+  width:32px;height:32px;
+  border-radius:8px;
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;
+  font-weight:600;
+}
+
+.avatar.ai{
+  background:var(--accent);
+  color:#fff;
+  font-size:14px;
+}
+
+.avatar.user{
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  color:var(--text2);
+}
+
+.bubble{
+  max-width:72%;
+  padding:12px 16px;
+  border-radius:12px;
+  font-size:13.5px;
+  line-height:1.65;
+  white-space:pre-wrap;
+}
+
+.bubble.ai{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-bottom-left-radius:4px;
+}
+
+.bubble.user{
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-bottom-right-radius:4px;
+  color:var(--text);
+}
+
+.bubble.thinking{
+  background:var(--surface);
+  border:1px solid var(--border);
+  color:var(--text3);
+  font-style:italic;
+  font-size:12px;
+  display:flex;align-items:center;gap:8px;
+}
+
+.dots span{
+  display:inline-block;
+  width:5px;height:5px;
+  background:var(--text3);
+  border-radius:50%;
+  animation:dot .9s ease-in-out infinite;
+}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,80%,100%{transform:scale(.6);opacity:.3}40%{transform:scale(1);opacity:1}}
+
+/* urgência lateral */
+.bubble.verde{border-left:3px solid var(--green)}
+.bubble.amarelo{border-left:3px solid var(--yellow)}
+.bubble.vermelho{border-left:3px solid var(--red)}
+
+/* tag de urgência inline */
+.urgencia-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  border-radius:5px;
+  padding:2px 8px;
+  font-size:11px;
+  font-weight:600;
+  margin-bottom:8px;
+}
+.urgencia-tag.verde{background:var(--green-bg);color:var(--green)}
+.urgencia-tag.amarelo{background:var(--yellow-bg);color:var(--yellow)}
+.urgencia-tag.vermelho{background:var(--red-bg);color:var(--red)}
+
+/* ─── EXEMPLOS ────────────────────────────────── */
+.exemplos-bar{
+  padding:12px 28px;
+  border-top:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  background:var(--bg2);
+}
+
+.ex-label{
+  font-size:10px;
+  color:var(--text3);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  white-space:nowrap;
+}
+
+.chip{
+  background:var(--surface);
+  border:1px solid var(--border2);
+  border-radius:20px;
+  padding:4px 11px;
+  font-size:11px;
+  color:var(--text2);
+  cursor:pointer;
+  white-space:nowrap;
+  transition:all .15s;
+  font-family:var(--font);
+}
+.chip:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
+
+/* ─── INPUT ───────────────────────────────────── */
+.input-area{
+  padding:12px 28px 20px;
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+}
+
+.input-row{
+  display:flex;
+  gap:8px;
+  align-items:flex-end;
+}
+
+.input-box{
+  flex:1;
+  background:var(--surface);
+  border:1px solid var(--border2);
+  border-radius:var(--r2);
+  display:flex;
+  align-items:center;
+  padding:0 14px;
+  transition:border-color .2s,box-shadow .2s;
+}
+.input-box:focus-within{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-glow);
+}
+
+.input-box input{
+  flex:1;
+  background:transparent;
+  border:none;
+  outline:none;
+  color:var(--text);
+  font-family:var(--font);
+  font-size:14px;
+  padding:13px 0;
+  box-shadow:none;
+}
+.input-box input::placeholder{color:var(--text3)}
+
+.send-btn{
+  width:44px;height:44px;
+  background:var(--accent);
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .2s,transform .1s,background .2s;
+  flex-shrink:0;
+}
+.send-btn:hover{opacity:.85}
+.send-btn:active{transform:scale(.93)}
+.send-btn:disabled{opacity:.3;cursor:not-allowed}
+.send-btn svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ─── WELCOME ─────────────────────────────────── */
+.welcome{
+  margin:auto;
+  text-align:center;
+  padding:40px 20px;
+  max-width:460px;
+}
+.welcome-icon{font-size:48px;margin-bottom:16px}
+.welcome h2{font-size:22px;font-weight:600;margin-bottom:8px;letter-spacing:-.02em}
+.welcome p{font-size:13px;color:var(--text2);line-height:1.6}
+
+/* ─── SCROLLBAR (sidebar) ─────────────────────── */
+.sidebar-section:has(textarea){overflow-y:auto;max-height:calc(100vh - 350px)}
+
+/* ─── RESPONSIVO ──────────────────────────────── */
+@media(max-width:800px){
+  body{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .sidebar{max-height:50vh;overflow-y:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="logo">
+      <div class="logo-icon">+</div>
+      <div class="logo-text">Triagem<span>IA</span></div>
+    </div>
+    <div class="version-pill">
+      <div class="dot-live"></div>
+      Exercício de sala · Eng. Software
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="section-label">Conexão</div>
+    <div class="field-group">
+      <label>Chave de API Anthropic</label>
+      <input type="text" id="api-key" placeholder="sk-ant-api03-..." autocomplete="off" />
+      <p class="api-warn">&#9888; Nunca committar em repositório público</p>
+    </div>
+    <div class="field-group">
+      <label>Modelo</label>
+      <select id="modelo" onchange="atualizarBadge()">
+        <option value="claude-haiku-4-5-20251001">claude-haiku — rápido e barato</option>
+        <option value="claude-sonnet-4-6">claude-sonnet — mais capaz</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="sidebar-section" style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+    <div class="section-label">System Prompt — edite para o exercício</div>
+    <textarea id="system-prompt">Você é o TriagemIA, assistente de triagem de saúde do SUS. Oriente o usuário sobre a urgência do sintoma.
+
+SEMPRE classifique como uma das três categorias:
+🟢 VERDE — pode aguardar consulta agendada
+🟡 AMARELO — procure UPA em até 24h
+🔴 VERMELHO — vá à UPA ou ligue 192 (SAMU) agora
+
+Estrutura da resposta:
+1. Urgência com emoji e nível
+2. Possíveis causas (2-3, sem diagnóstico definitivo)
+3. O que fazer agora
+4. Sinal de alerta: quando ir imediatamente
+
+Seja empático e objetivo. NUNCA faça diagnóstico definitivo. Sempre recomende buscar profissional de saúde.</textarea>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="section-label" style="margin-bottom:8px">Sessão atual</div>
+    <div class="stat-row">
+      <div class="stat green"><div class="stat-num" id="cnt-verde">0</div><div class="stat-lbl">Verde</div></div>
+      <div class="stat yellow"><div class="stat-num" id="cnt-amarelo">0</div><div class="stat-lbl">Amarelo</div></div>
+      <div class="stat red"><div class="stat-num" id="cnt-vermelho">0</div><div class="stat-lbl">Vermelho</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">Chat de Triagem</div>
+    <div class="topbar-sub">API Anthropic · Chamada direta do browser</div>
+    <div class="topbar-right">
+      <div class="model-badge" id="model-badge">haiku</div>
+      <button class="btn-clear" onclick="limpar()">Limpar conversa</button>
+    </div>
+  </div>
+
+  <div class="messages" id="messages">
+    <div class="welcome">
+      <div class="welcome-icon">&#x2695;</div>
+      <h2>Bem-vindo ao TriagemIA</h2>
+      <p>Descreva seus sintomas e receba uma orientação de urgência. Este é um exercício acadêmico — não substitui consulta médica.</p>
+    </div>
+  </div>
+
+  <div class="exemplos-bar">
+    <span class="ex-label">Testar:</span>
+    <div class="chip" onclick="usarExemplo(this)">Dor de cabeça e febre há 2 dias</div>
+    <div class="chip" onclick="usarExemplo(this)">Dor forte no peito e falta de ar</div>
+    <div class="chip" onclick="usarExemplo(this)">Tosse seca há 1 semana</div>
+    <div class="chip" onclick="usarExemplo(this)">Dor abdominal intensa com vômito</div>
+    <div class="chip" onclick="usarExemplo(this)">Manchas vermelhas no corpo</div>
+    <div class="chip" onclick="usarExemplo(this)">Tontura ao levantar</div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-row">
+      <div class="input-box">
+        <input type="text" id="user-input" placeholder="Descreva seu sintoma principal..." />
+      </div>
+      <button class="send-btn" id="send-btn" onclick="enviar()" title="Enviar">
+        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+</main>
+
+<script>
+const historico = [];
+const contadores = {verde:0, amarelo:0, vermelho:0};
+
+function atualizarBadge(){
+  const v = document.getElementById('modelo').value;
+  document.getElementById('model-badge').textContent = v.includes('haiku') ? 'haiku' : 'sonnet';
+}
+
+function usarExemplo(el){
+  const inp = document.getElementById('user-input');
+  inp.value = el.textContent;
+  inp.focus();
+}
+
+function limpar(){
+  historico.length = 0;
+  contadores.verde = contadores.amarelo = contadores.vermelho = 0;
+  atualizarStats();
+  const msgs = document.getElementById('messages');
+  msgs.innerHTML = `
+    <div class="welcome">
+      <div class="welcome-icon">&#x2695;</div>
+      <h2>Conversa limpa</h2>
+      <p>Inicie uma nova triagem descrevendo seus sintomas abaixo.</p>
+    </div>`;
+}
+
+function atualizarStats(){
+  document.getElementById('cnt-verde').textContent = contadores.verde;
+  document.getElementById('cnt-amarelo').textContent = contadores.amarelo;
+  document.getElementById('cnt-vermelho').textContent = contadores.vermelho;
+}
+
+function detectarUrgencia(txt){
+  const t = txt.toLowerCase();
+  if(t.includes('🔴') || t.includes('vermelho')) return 'vermelho';
+  if(t.includes('🟡') || t.includes('amarelo'))  return 'amarelo';
+  if(t.includes('🟢') || t.includes('verde'))    return 'verde';
+  return '';
+}
+
+function labelUrgencia(nivel){
+  if(!nivel) return '';
+  const map = {verde:'🟢 VERDE', amarelo:'🟡 AMARELO', vermelho:'🔴 VERMELHO'};
+  return `<div class="urgencia-tag ${nivel}">${map[nivel]}</div>\n`;
+}
+
+function addMsg(role, texto, urgencia=''){
+  const msgs = document.getElementById('messages');
+  // remove welcome se existir
+  const welcome = msgs.querySelector('.welcome');
+  if(welcome) welcome.remove();
+
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap ' + (role==='user' ? 'user' : 'ai');
+
+  const av = document.createElement('div');
+  av.className = 'avatar ' + (role==='user' ? 'user' : 'ai');
+  av.textContent = role==='user' ? 'V' : '+';
+
+  const bub = document.createElement('div');
+  bub.className = 'bubble ' + (role==='user' ? 'user' : 'ai') + (urgencia ? ' '+urgencia : '');
+
+  if(role==='assistant' && urgencia){
+    bub.innerHTML = labelUrgencia(urgencia) + escapeHtml(texto);
+  } else {
+    bub.textContent = texto;
+  }
+
+  wrap.appendChild(av);
+  wrap.appendChild(bub);
+  msgs.appendChild(wrap);
+  msgs.scrollTop = msgs.scrollHeight;
+  return bub;
+}
+
+function addThinking(){
+  const msgs = document.getElementById('messages');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap ai';
+  wrap.id = 'thinking-wrap';
+
+  const av = document.createElement('div');
+  av.className = 'avatar ai';
+  av.textContent = '+';
+
+  const bub = document.createElement('div');
+  bub.className = 'bubble thinking';
+  bub.innerHTML = '<span>Analisando</span><span class="dots"><span></span><span></span><span></span></span>';
+
+  wrap.appendChild(av);
+  wrap.appendChild(bub);
+  msgs.appendChild(wrap);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function escapeHtml(t){
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+document.getElementById('user-input').addEventListener('keydown', e=>{
+  if(e.key==='Enter' && !e.shiftKey){e.preventDefault(); enviar();}
+});
+
+async function enviar(){
+  const input     = document.getElementById('user-input');
+  const apiKey    = document.getElementById('api-key').value.trim();
+  const modelo    = document.getElementById('modelo').value;
+  const sysPrompt = document.getElementById('system-prompt').value.trim();
+  const texto     = input.value.trim();
+
+  if(!texto) return;
+
+  if(!apiKey || !apiKey.startsWith('sk-ant-')){
+    addMsg('assistant', '⚠️ Insira a chave de API no campo lateral. O professor disponibilizou uma chave para a aula de hoje.');
+    return;
+  }
+
+  addMsg('user', texto);
+  input.value = '';
+  historico.push({role:'user', content: texto});
+
+  const btn = document.getElementById('send-btn');
+  btn.disabled = true;
+  addThinking();
+
+  try{
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body: JSON.stringify({
+        model: modelo,
+        max_tokens: 900,
+        system: sysPrompt,
+        messages: historico
+      })
+    });
+
+    const thinking = document.getElementById('thinking-wrap');
+    if(thinking) thinking.remove();
+
+    if(!res.ok){
+      const err = await res.json();
+      throw new Error(err.error?.message || 'Erro HTTP ' + res.status);
+    }
+
+    const data = await res.json();
+    const resposta = data.content[0].text;
+    const urgencia = detectarUrgencia(resposta);
+
+    addMsg('assistant', resposta, urgencia);
+    historico.push({role:'assistant', content: resposta});
+
+    if(urgencia){
+      contadores[urgencia]++;
+      atualizarStats();
+    }
+
+  } catch(err){
+    const thinking = document.getElementById('thinking-wrap');
+    if(thinking) thinking.remove();
+    addMsg('assistant', '❌ Erro: ' + err.message + '\n\nVerifique a chave de API e a conexão com a internet.');
+  } finally{
+    btn.disabled = false;
+    input.focus();
+  }
+}
+</script>
+</body>
+</html>
